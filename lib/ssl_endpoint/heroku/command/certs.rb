@@ -24,7 +24,7 @@ class Heroku::Command::Certs < Heroku::Command::BaseWithApp
         endpoint
       end
 
-      display_table endpoints, %w( cname domain expires ), ["Endpoint" "Domain" "Cert Expires"]
+      display_table endpoints, %w( cname domain expires ), [ "Endpoint", "Domain(s)", "Cert. Expires" ]
     end
   end
 
