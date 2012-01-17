@@ -60,7 +60,7 @@ class Heroku::Command::Certs < Heroku::Command::BaseWithApp
     end
   end
 
-  # certs:update
+  # certs:update PEM KEY
   #
   # update an SSL endpoint on an app
   #
