@@ -1,3 +1,3 @@
 require "heroku/command"
-require "ssl/heroku/client"
-require "ssl/heroku/command/certs"
+require "ssl_endpoint/heroku/client"
+require "ssl_endpoint/heroku/command/certs"
