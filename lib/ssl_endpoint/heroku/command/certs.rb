@@ -1,8 +1,7 @@
 require "heroku/command/base"
 require "ssl_endpoint/heroku/run_with_status"
 
-# CLI to certs:endpoint API (a replacement for old SSL based on IP, hostname, or 
-# SNI).
+# manage ssl endpoints for an app
 #
 class Heroku::Command::Certs < Heroku::Command::BaseWithApp
 
