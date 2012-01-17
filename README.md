@@ -8,31 +8,31 @@ Installation
 
 Install this plugin:
 
-    $ heroku plugins:install https://github.com/heroku/heroku-certs.git
+    heroku plugins:install https://github.com/heroku/heroku-certs.git
 
 Activate the `ssl:endpoint` addon:
 
-    $ heroku addons:add ssl:endpoint
+    heroku addons:add ssl:endpoint
 
 Usage
 -----
 
 Your app must be configured with a domain that will be protected by the SSL certificate you'll be adding:
 
-    $ heroku domains:add example.org
+    heroku domains:add example.org
 
 Now you're ready to create an SSL endpoint right after you've acquired a certificate:
 
-    $ heroku certs:add example.org.crt example.org.key
+    heroku certs:add example.org.crt example.org.key
 
 Check that your certificate was added successfully:
 
-    $ heroku certs
+    heroku certs
 
 Tests
 -----
 
 Run the test suite using:
 
-    $ bundle install
-    $ rake spec
+    bundle install
+    rake spec
