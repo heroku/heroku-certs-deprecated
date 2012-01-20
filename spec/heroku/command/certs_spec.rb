@@ -11,11 +11,13 @@ module Heroku::Command
         @certs.heroku.should_receive(:ssl_endpoint_list).with('myapp').and_return([
           { 'cname' => 'tokyo-1050', 
             'ssl_cert' => {
+              'ca_signed' => false, 
               'cert_domains' => [ 'example.org' ], 
               'expires_at' => Time.now.to_s, 
           }, }, 
           { 'cname' => 'akita-7777', 
             'ssl_cert' => {
+              'ca_signed' => true, 
               'cert_domains' => [ 'heroku.com' ], 
               'expires_at' => Time.now.to_s, 
           }, }, 

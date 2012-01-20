@@ -19,12 +19,13 @@ class Heroku::Command::Certs < Heroku::Command::BaseWithApp
       display "Use 'heroku certs:add <pemfile> <keyfile>' to create a SSL endpoint."
     else
       endpoints.map! do |endpoint|
-        endpoint["domain"] = endpoint["ssl_cert"]["cert_domains"].join(", ")
-        endpoint["expires"] = Time.parse(endpoint["ssl_cert"]["expires_at"]).strftime("%Y-%m-%d %H:%M:%S")
+        endpoint["ca_signed"] = endpoint["ssl_cert"]["ca_signed"].to_s.capitalize
+        endpoint["domain"]    = endpoint["ssl_cert"]["cert_domains"].join(", ")
+        endpoint["expires"]   = Time.parse(endpoint["ssl_cert"]["expires_at"]).strftime("%Y-%m-%d %H:%M:%S %Z")
         endpoint
       end
 
-      display_table endpoints, %w( cname domain expires ), [ "Endpoint", "Domain(s)", "Cert. Expires" ]
+      display_table endpoints, %w( cname domain expires ca_signed ), [ "Endpoint", "Common Name(s)", "Expires", "Trusted" ]
     end
   end
 
@@ -39,7 +40,7 @@ class Heroku::Command::Certs < Heroku::Command::BaseWithApp
 
     pem = File.read(args[0]) rescue error("Unable to read PEM")
     key = File.read(args[1]) rescue error("Unable to read KEY")
-    app = self.respond_to?(:extract_app) ? self.extract_app : self.app
+    app = self.respond_to?(:app) ? self.app : self.extract_app
 
     info = nil
     run_with_status("-----> Adding SSL endpoint to #{app}") do
@@ -71,7 +72,7 @@ class Heroku::Command::Certs < Heroku::Command::BaseWithApp
 
     pem = File.read(args[0]) rescue error("Unable to read PEM")
     key = File.read(args[1]) rescue error("Unable to read KEY")
-    app = self.respond_to?(:extract_app) ? self.extract_app : self.app
+    app = self.respond_to?(:app) ? self.app : self.extract_app
     cname = options[:endpoint] || current_endpoint
 
     run_with_status("-----> Updating SSL endpoint #{cname} for #{app}") do
