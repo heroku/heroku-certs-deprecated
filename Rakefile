@@ -10,5 +10,7 @@ RSpec::Core::RakeTask.new do |t|
 end
 
 task :deploy do
-  `mkdir -p $HOME/.heroku/plugins/heroku-certs && rm -rf $HOME/.heroku/plugins/heroku-certs/* && cp -r * $HOME/.heroku/plugins/heroku-certs/`
+  `mkdir -p $HOME/.heroku/plugins/heroku-certs \
+    && rm -rf $HOME/.heroku/plugins/heroku-certs/* \
+    && cp -r * $HOME/.heroku/plugins/heroku-certs/`
 end
