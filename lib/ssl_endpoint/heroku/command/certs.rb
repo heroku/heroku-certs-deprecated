@@ -59,6 +59,8 @@ class Heroku::Command::Certs < Heroku::Command::BaseWithApp
     run_with_status("-----> Removing SSL endpoint #{cname} from #{app}") do
       heroku.ssl_endpoint_remove(app, cname)
     end
+    display_indented "De-provisioned endpoint #{cname}."
+    display_indented "NOTE: Billing is still active. Remove SSL endpoint add-on to stop billing."
   end
 
   # certs:update PEM KEY
@@ -96,6 +98,10 @@ class Heroku::Command::Certs < Heroku::Command::BaseWithApp
   def current_endpoint
     endpoint = heroku.ssl_endpoint_list(app).first || error("No SSL endpoints exist for #{app}")
     endpoint["cname"]
+  end
+
+  def display_indented(str)
+    display "       " + str
   end
 
 end
