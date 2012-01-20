@@ -19,13 +19,13 @@ class Heroku::Command::Certs < Heroku::Command::BaseWithApp
       display "Use 'heroku certs:add <pemfile> <keyfile>' to create a SSL endpoint."
     else
       endpoints.map! do |endpoint|
-        endpoint["ca_signed"] = endpoint["ssl_cert"]["ca_signed"].to_s.capitalize
-        endpoint["domain"]    = endpoint["ssl_cert"]["cert_domains"].join(", ")
-        endpoint["expires"]   = Time.parse(endpoint["ssl_cert"]["expires_at"]).strftime("%Y-%m-%d %H:%M:%S %Z")
+        endpoint["ca_signed?"] = endpoint["ssl_cert"]["ca_signed?"].to_s.capitalize
+        endpoint["domain"]     = endpoint["ssl_cert"]["cert_domains"].join(", ")
+        endpoint["expires"]    = Time.parse(endpoint["ssl_cert"]["expires_at"]).strftime("%Y-%m-%d %H:%M:%S %Z")
         endpoint
       end
 
-      display_table endpoints, %w( cname domain expires ca_signed ), [ "Endpoint", "Common Name(s)", "Expires", "Trusted" ]
+      display_table endpoints, %w( cname domain expires ca_signed? ), [ "Endpoint", "Common Name(s)", "Expires", "Trusted" ]
     end
   end
 
