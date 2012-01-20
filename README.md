@@ -29,6 +29,13 @@ Check that your certificate was added successfully:
 
     heroku certs
 
+Development
+-----------
+
+A simple Rake task is bundled to easily deploy the current state of the plugin to your Heroku gem's plugins directory (i.e. `~/.heroku/plugins`):
+
+    rake deploy
+
 Tests
 -----
 

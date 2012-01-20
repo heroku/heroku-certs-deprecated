@@ -9,10 +9,6 @@ RSpec::Core::RakeTask.new do |t|
   t.pattern = "spec/**/*_spec.rb"
 end
 
-=begin
-require "rake/testtask"
-
-Rake::TestTask.new do |t|
-  t.pattern = "spec/**/*_spec.rb"
+task :deploy do
+  `mkdir -p $HOME/.heroku/plugins/heroku-certs && rm -rf $HOME/.heroku/plugins/heroku-certs/* && cp -r * $HOME/.heroku/plugins/heroku-certs/`
 end
-=end
