@@ -47,7 +47,7 @@ class Heroku::Command::Certs < Heroku::Command::BaseWithApp
       info = heroku.ssl_endpoint_add(app, pem, key)
     end
 
-    display "       #{app} now served by #{info['cname']}"
+    display_indented "#{app} now served by #{info['cname']}"
   end
 
   # certs:remove
