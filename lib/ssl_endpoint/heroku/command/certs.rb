@@ -18,14 +18,8 @@ class Heroku::Command::Certs < Heroku::Command::BaseWithApp
       display "No SSL endpoints setup."
       display "Use 'heroku certs:add <pemfile> <keyfile>' to create a SSL endpoint."
     else
-      endpoints.map! do |endpoint|
-        endpoint["ca_signed?"] = endpoint["ssl_cert"]["ca_signed?"].to_s.capitalize
-        endpoint["domain"]     = endpoint["ssl_cert"]["cert_domains"].join(", ")
-        endpoint["expires"]    = Time.parse(endpoint["ssl_cert"]["expires_at"]).strftime("%Y-%m-%d %H:%M:%S %Z")
-        endpoint
-      end
-
-      display_table endpoints, %w( cname domain expires ca_signed? ), [ "Endpoint", "Common Name(s)", "Expires", "Trusted" ]
+      endpoints.map!{ |e| format_endpoint(e) }
+      display_table endpoints, %w( cname domains expires_at ca_signed? ), [ "Endpoint", "Common Name(s)", "Expires", "Trusted" ]
     end
   end
 
@@ -42,12 +36,16 @@ class Heroku::Command::Certs < Heroku::Command::BaseWithApp
     key = File.read(args[1]) rescue error("Unable to read KEY")
     app = self.respond_to?(:app) ? self.app : self.extract_app
 
-    info = nil
+    endpoint = nil
     run_with_status("-----> Adding SSL endpoint to #{app}") do
-      info = heroku.ssl_endpoint_add(app, pem, key)
+      endpoint = heroku.ssl_endpoint_add(app, pem, key)
     end
 
-    display_indented "#{app} now served by #{info['cname']}"
+    indent(7) do
+      display_indented "#{app} now served by #{endpoint['cname']}"
+      display_indented "Certificate details:"
+      display_certificate_info(endpoint)
+    end
   end
 
   # certs:remove
@@ -59,8 +57,10 @@ class Heroku::Command::Certs < Heroku::Command::BaseWithApp
     run_with_status("-----> Removing SSL endpoint #{cname} from #{app}") do
       heroku.ssl_endpoint_remove(app, cname)
     end
-    display_indented "De-provisioned endpoint #{cname}."
-    display_indented "NOTE: Billing is still active. Remove SSL endpoint add-on to stop billing."
+    indent(7) do
+      display_indented "De-provisioned endpoint #{cname}."
+      display_indented "NOTE: Billing is still active. Remove SSL endpoint add-on to stop billing."
+    end
   end
 
   # certs:update PEM KEY
@@ -77,8 +77,14 @@ class Heroku::Command::Certs < Heroku::Command::BaseWithApp
     app = self.respond_to?(:app) ? self.app : self.extract_app
     cname = options[:endpoint] || current_endpoint
 
+    endpoint = nil
     run_with_status("-----> Updating SSL endpoint #{cname} for #{app}") do
-      heroku.ssl_endpoint_update(app, cname, pem, key)
+      endpoint = heroku.ssl_endpoint_update(app, cname, pem, key)
+    end
+
+    indent(7) do
+      display_indented "Updated certificate details:"
+      display_certificate_info(endpoint)
     end
   end
 
@@ -89,19 +95,64 @@ class Heroku::Command::Certs < Heroku::Command::BaseWithApp
   def rollback
     cname = options[:endpoint] || current_endpoint
     run_with_status("-----> Rolling back SSL endpoint #{cname} on #{app}") do
-      heroku.ssl_endpoint_rollback(app, cname)
+      endpoint = heroku.ssl_endpoint_rollback(app, cname)
     end
+
+=begin
+    indent(7) do
+      display_indented "New active certificate details:"
+      display_certificate_info(endpoint)
+    end
+=end
   end
 
   private
+
+  TIME_FORMAT = "%Y-%m-%d %H:%M:%S %Z"
 
   def current_endpoint
     endpoint = heroku.ssl_endpoint_list(app).first || error("No SSL endpoints exist for #{app}")
     endpoint["cname"]
   end
 
+  def display_certificate_info(endpoint)
+    endpoint = format_endpoint(endpoint)
+    indent(4) do
+      display_indented("subject: %s"        % endpoint['subject'])
+      display_indented("start date: %s"     % endpoint['starts_at'])
+      display_indented("expire date: %s"    % endpoint['expires_at'])
+      display_indented("common name(s): %s" % endpoint['domains'])
+      display_indented("issuer: %s"         % endpoint['issuer'])
+      if endpoint["ssl_cert"]["ca_signed?"]
+        display_indented("SSL certificate is verified by a root authority.")
+      elsif endpoint["issuer"] == endpoint["subject"]
+        display_indented("SSL certificate is self signed.")
+      else
+        display_indented("SSL certificate is not trusted.")
+      end
+    end
+  end
+
   def display_indented(str)
-    display "       " + str
+    @indent_size ||= 0
+    display " " * @indent_size + str
+  end
+
+  def format_endpoint(endpoint)
+    endpoint["ca_signed?"] = endpoint["ssl_cert"]["ca_signed?"].to_s.capitalize
+    endpoint["domains"]    = endpoint["ssl_cert"]["cert_domains"].join(", ")
+    endpoint["expires_at"] = Time.parse(endpoint["ssl_cert"]["expires_at"]).strftime(TIME_FORMAT)
+    endpoint["issuer"]     = endpoint["ssl_cert"]["issuer"]
+    endpoint["starts_at"]  = Time.parse(endpoint["ssl_cert"]["starts_at"]).strftime(TIME_FORMAT)
+    endpoint["subject"]    = endpoint["ssl_cert"]["subject"]
+    endpoint
+  end
+
+  def indent(size)
+    @indent_size ||= 0
+    @indent_size += size
+    yield
+    @indent_size -= size
   end
 
 end
