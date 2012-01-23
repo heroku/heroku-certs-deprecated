@@ -3,6 +3,10 @@ class Heroku::Client
     json_decode(post("v3/apps/#{app}/ssl_endpoints", :accept => :json, :pem => pem, :key => key).to_s)
   end
 
+  def ssl_endpoint_info(app, cname)
+    json_decode(get("v3/apps/#{app}/ssl_endpoints/#{escape(cname)}", :accept => :json).to_s)
+  end
+
   def ssl_endpoint_list(app)
     json_decode(get("v3/apps/#{app}/ssl_endpoints", :accept => :json).to_s)
   end

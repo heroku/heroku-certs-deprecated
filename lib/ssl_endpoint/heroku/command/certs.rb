@@ -48,6 +48,23 @@ class Heroku::Command::Certs < Heroku::Command::BaseWithApp
     end
   end
 
+  # certs:info
+  #
+  # show certificate information for an SSL endpoint
+  #
+  def info
+    cname = options[:endpoint] || current_endpoint
+    endpoint = nil
+    run_with_status("-----> Fetching information on SSL endpoint #{cname}") do
+      endpoint = heroku.ssl_endpoint_info(app, cname)
+    end
+
+    indent(7) do
+      display_indented "Certificate details:"
+      display_certificate_info(endpoint)
+    end
+  end
+
   # certs:remove
   #
   # remove an SSL endpoint from an app
