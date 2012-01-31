@@ -1,11 +1,11 @@
 @todo
 =====
 
-* Need to show certificate info when rolling back?
 
 Finished
 --------
 
+* Need to show certificate info when rolling back?
 * Show cert info action
 * Cough up certificate info when adding, updating, rolling back
 * Check if update works properly IRL (it did not)
