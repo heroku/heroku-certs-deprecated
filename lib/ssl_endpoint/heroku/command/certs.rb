@@ -111,16 +111,16 @@ class Heroku::Command::Certs < Heroku::Command::BaseWithApp
   #
   def rollback
     cname = options[:endpoint] || current_endpoint
+
+    endpoint = nil
     run_with_status("-----> Rolling back SSL endpoint #{cname} on #{app}") do
       endpoint = heroku.ssl_endpoint_rollback(app, cname)
     end
 
-=begin
     indent(7) do
       display_indented "New active certificate details:"
       display_certificate_info(endpoint)
     end
-=end
   end
 
   private

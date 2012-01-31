@@ -111,13 +111,13 @@ module Heroku::Command
 
       describe "certs:rollback" do
         it "rolls back an endpoint by querying server for a cname" do
-          @certs.heroku.should_receive(:ssl_endpoint_rollback).with('myapp', 'akita-7777').and_return({ 'cname' => 'akita-7777' })
+          @certs.heroku.should_receive(:ssl_endpoint_rollback).with('myapp', 'akita-7777').and_return(endpoint2)
           @certs.rollback
         end
 
         it "rolls back an endpoint specified as an option" do
           @certs.stub!(:options).and_return({ :endpoint => 'kyoto-1234' })
-          @certs.heroku.should_receive(:ssl_endpoint_rollback).with('myapp', 'kyoto-1234').and_return({ 'cname' => 'akita-7777' })
+          @certs.heroku.should_receive(:ssl_endpoint_rollback).with('myapp', 'kyoto-1234').and_return(endpoint2)
           @certs.rollback
         end
       end
