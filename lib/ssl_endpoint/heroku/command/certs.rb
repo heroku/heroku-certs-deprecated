@@ -1,10 +1,12 @@
 require "heroku/command/base"
+require "ssl_endpoint/heroku/indentable"
 require "ssl_endpoint/heroku/run_with_status"
 
 # manage ssl endpoints for an app
 #
 class Heroku::Command::Certs < Heroku::Command::BaseWithApp
 
+  include Heroku::Indentable
   include Heroku::RunWithStatus
 
   # certs
@@ -37,7 +39,7 @@ class Heroku::Command::Certs < Heroku::Command::BaseWithApp
     app = self.respond_to?(:app) ? self.app : self.extract_app
 
     endpoint = nil
-    run_with_status("-----> Adding SSL endpoint to #{app}") do
+    run_with_status("Adding SSL endpoint to #{app}") do
       endpoint = heroku.ssl_endpoint_add(app, pem, key)
     end
 
@@ -55,7 +57,7 @@ class Heroku::Command::Certs < Heroku::Command::BaseWithApp
   def info
     cname = options[:endpoint] || current_endpoint
     endpoint = nil
-    run_with_status("-----> Fetching information on SSL endpoint #{cname}") do
+    run_with_status("Fetching information on SSL endpoint #{cname}") do
       endpoint = heroku.ssl_endpoint_info(app, cname)
     end
 
@@ -71,7 +73,7 @@ class Heroku::Command::Certs < Heroku::Command::BaseWithApp
   #
   def remove
     cname = options[:endpoint] || current_endpoint
-    run_with_status("-----> Removing SSL endpoint #{cname} from #{app}") do
+    run_with_status("Removing SSL endpoint #{cname} from #{app}") do
       heroku.ssl_endpoint_remove(app, cname)
     end
     indent(7) do
@@ -95,7 +97,7 @@ class Heroku::Command::Certs < Heroku::Command::BaseWithApp
     cname = options[:endpoint] || current_endpoint
 
     endpoint = nil
-    run_with_status("-----> Updating SSL endpoint #{cname} for #{app}") do
+    run_with_status("Updating SSL endpoint #{cname} for #{app}") do
       endpoint = heroku.ssl_endpoint_update(app, cname, pem, key)
     end
 
@@ -113,7 +115,7 @@ class Heroku::Command::Certs < Heroku::Command::BaseWithApp
     cname = options[:endpoint] || current_endpoint
 
     endpoint = nil
-    run_with_status("-----> Rolling back SSL endpoint #{cname} on #{app}") do
+    run_with_status("Rolling back SSL endpoint #{cname} on #{app}") do
       endpoint = heroku.ssl_endpoint_rollback(app, cname)
     end
 
@@ -150,11 +152,6 @@ class Heroku::Command::Certs < Heroku::Command::BaseWithApp
     end
   end
 
-  def display_indented(str)
-    @indent_size ||= 0
-    display " " * @indent_size + str
-  end
-
   def format_endpoint(endpoint)
     endpoint["ca_signed?"] = endpoint["ssl_cert"]["ca_signed?"].to_s.capitalize
     endpoint["domains"]    = endpoint["ssl_cert"]["cert_domains"].join(", ")
@@ -163,13 +160,6 @@ class Heroku::Command::Certs < Heroku::Command::BaseWithApp
     endpoint["starts_at"]  = Time.parse(endpoint["ssl_cert"]["starts_at"]).strftime(TIME_FORMAT)
     endpoint["subject"]    = endpoint["ssl_cert"]["subject"]
     endpoint
-  end
-
-  def indent(size)
-    @indent_size ||= 0
-    @indent_size += size
-    yield
-    @indent_size -= size
   end
 
 end
