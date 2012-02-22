@@ -44,6 +44,7 @@ class Heroku::Command::Certs < Heroku::Command::BaseWithApp
     end
 
     indent(7) do
+      display_warnings(endpoint)
       display_indented "#{app} now served by #{endpoint['cname']}"
       display_indented "Certificate details:"
       display_certificate_info(endpoint)
@@ -102,6 +103,7 @@ class Heroku::Command::Certs < Heroku::Command::BaseWithApp
     end
 
     indent(7) do
+      display_warnings(endpoint)
       display_indented "Updated certificate details:"
       display_certificate_info(endpoint)
     end
@@ -148,6 +150,14 @@ class Heroku::Command::Certs < Heroku::Command::BaseWithApp
         display_indented("SSL certificate is self signed.")
       else
         display_indented("SSL certificate is not trusted.")
+      end
+    end
+  end
+
+  def display_warnings(endpoint)
+    if endpoint["warnings"]
+      endpoint["warnings"].each do |field, warning|
+        display_indented("WARNING: #{field} #{warning}")
       end
     end
   end
