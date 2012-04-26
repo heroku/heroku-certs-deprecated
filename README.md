@@ -1,7 +1,7 @@
 SSL Endpoint Heroku CLI Plugin
 ==============================
 
-**NOTICE: Certs has been merged to the Heroku plugin. This plugin is no longer required and is now deprecated.**
+**NOTICE: Certs has been merged to the Heroku gem. This plugin is no longer required and is now deprecated.**
 
 A plugin for the Heroku command line interface to perform operations against an app's SSL endpoints. SSL endpoints are Heroku's new unified SSL solution for the Heroku platform.
 
